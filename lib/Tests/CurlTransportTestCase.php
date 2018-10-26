@@ -23,16 +23,15 @@ class CurlTransportTestCase extends TestCase
         $r = $this->transport->getUrl('http://kartoffelkatzenhoffentlichregistriertniemand.jemals.so.eine.komische.domain');
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $r);
         $this->assertFalse($r->isOk());
-        $this->assertEmpty($r->getContent());
     }
 
     public function testSimpleHtml()
     {
-        $r = $this->transport->getUrl('http://wheregroup.com');
+        $r = $this->transport->getUrl('http://example.com');
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $r);
         $this->assertTrue($r->isOk());
         $this->assertNotEmpty($r->getContent());
-        $trimmed = trim($r->getContent());
+        $trimmed = trim(preg_replace('#(<!-- [^>]*?-->\s*)*#m', '', trim($r->getContent())));
         $cleanStart = stripos($trimmed, '<!doctype') === 0 || stripos($trimmed, '<html') === 0;
         $cleanEnd = strripos($trimmed, '</html>') === (strlen($trimmed) - strlen('</html>'));
         $this->assertTrue($cleanStart);
