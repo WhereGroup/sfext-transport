@@ -10,6 +10,20 @@ use Wheregroup\SymfonyExt\TransportBundle\Component\TransportInterface;
 
 class CurlTransport implements TransportInterface
 {
+    /** @var ProxySettings|null */
+    protected $proxySettings;
+
+    /**
+     * @param ProxySettings|array|null $proxySettings
+     */
+    public function __construct($proxySettings = null)
+    {
+        if ($proxySettings && is_array($proxySettings)) {
+            $proxySettings = ProxySettings::fromArray($proxySettings);
+        }
+        $this->proxySettings = $proxySettings ?: null;
+    }
+
     public function getUrl($url, RequestOptions $options = null)
     {
         $options = $options ?: RequestOptions::makeDefaults();
@@ -56,6 +70,19 @@ class CurlTransport implements TransportInterface
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_FAILONERROR => 0,
         );
+        if ($this->proxySettings) {
+            $curlOpts += array(
+                CURLOPT_PROXY => $this->proxySettings->host,
+                CURLOPT_PROXYPORT => $this->proxySettings->port,
+            );
+            if ($this->proxySettings->user) {
+                $curlOpts += array(CURLOPT_PROXYUSERPWD, implode(':', array(
+                    curl_escape($ch, $this->proxySettings->user),
+                    curl_escape($ch, $this->proxySettings->password),
+                )));
+            }
+        }
+
         curl_setopt_array($ch, $curlOpts);
         return $ch;
     }
