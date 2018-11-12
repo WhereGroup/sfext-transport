@@ -6,8 +6,6 @@ namespace Wheregroup\SymfonyExt\TransportBundle\Component\Http;
 
 /**
  * POD object to encapsulate http / https proxy settings
- *
- * @todo: support proxy user / password
  */
 class ProxySettings
 {
