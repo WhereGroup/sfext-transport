@@ -55,8 +55,9 @@ class ExternalRequestTest extends TestCase
         }
         $rawFragments = explode('&', implode('', array_slice(explode('?', $r->getUri()), 1)));
         foreach ($newParams as $newKey => $newValue) {
-            $fragmentMatch = urlencode($newKey) . '=' . urlencode($newValue);
-            $this->assertTrue(in_array($fragmentMatch, $rawFragments, true));
+            $fragmentMatch = rawurlencode($newKey) . '=' . rawurlencode($newValue);
+            $message = var_export($fragmentMatch, true) . " not found in query string";
+            $this->assertTrue(in_array($fragmentMatch, $rawFragments, true), $message);
         }
     }
 
